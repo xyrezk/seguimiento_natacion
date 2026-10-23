@@ -5,22 +5,7 @@ Registro personal de natación: día, metros, largos y tiempo. Es una PWA (app w
 ## Publicar en GitHub Pages
 
 1. Crea un repositorio en GitHub, por ejemplo `nado`. Puede ser público; tus datos no se suben, solo la app.
-2. Sube estos archivos a la raíz del repo:
-   ```
-   index.html
-   manifest.webmanifest
-   sw.js
-   icons/
-   ```
-   Puedes hacerlo con git:
-   ```bash
-   git init
-   git add .
-   git commit -m "Nado v1"
-   git branch -M main
-   git remote add origin https://github.com/TU_USUARIO/nado.git
-   git push -u origin main
-   ```
+2. Sube estos archivos a la raíz del repo
 3. En el repo ve a **Settings → Pages**. En *Source* elige **Deploy from a branch**, rama `main`, carpeta `/ (root)` y guarda.
 4. En uno o dos minutos queda en `https://TU_USUARIO.github.io/nado/`.
 
