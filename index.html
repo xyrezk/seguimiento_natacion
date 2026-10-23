@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<meta name="description" content="Registro personal de natación">
+<title>Nado</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+  :root{
+    --bg:#0b0f14; --surface:#121821; --line:#1e2731; --line2:#2a3542;
+    --text:#e6edf3; --muted:#7d8a99; --accent:#4fb3d9; --danger:#e5737a;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-tap-highlight-color:transparent}
+  main{max-width:520px;margin:0 auto;
+    padding:calc(16px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+  header{display:flex;align-items:baseline;justify-content:space-between;margin:8px 0 20px}
+  h1{font-size:22px;font-weight:600;letter-spacing:.04em;margin:0}
+  h1 i{font-style:normal;color:var(--accent)}
+  .sub{color:var(--muted);font-size:14px}
+  h2{font-size:13px;font-weight:500;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.08em;margin:0 0 10px;display:flex;justify-content:space-between}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  .stat b{display:block;font-size:19px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .stat small{color:var(--muted);font-size:12px;font-weight:400}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:26px}
+  .field{margin-bottom:14px}
+  label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:12px;font:inherit;font-size:18px;font-variant-numeric:tabular-nums;
+    appearance:none;-webkit-appearance:none;min-height:48px}
+  input:focus{outline:none;border-color:var(--accent)}
+  input::placeholder{color:#3e4a57}
+  .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{background:none;border:0;color:var(--muted);padding:10px;border-radius:8px;font:inherit;font-size:16px;cursor:pointer}
+  .seg button.on{background:var(--line2);color:var(--text)}
+  .hint{color:var(--muted);font-size:12px;margin-top:6px;min-height:16px}
+
+  .btn{width:100%;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:600;font-size:16px;cursor:pointer;
+    background:var(--accent);color:#06222e}
+  .btn:active{opacity:.85}
+  .btn.ghost{background:none;color:var(--muted);border:1px solid var(--line);font-weight:500;margin-top:8px}
+  .hidden{display:none!important}
+
+  ul{list-style:none;margin:0;padding:0}
+  .item{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+  .item.edit{border-color:var(--accent)}
+  .item-top{display:flex;justify-content:space-between;align-items:center}
+  .fecha{color:var(--muted);font-size:13px}
+  .del{background:none;border:0;color:var(--muted);font-size:22px;line-height:1;padding:0 4px;cursor:pointer}
+  .del:active{color:var(--danger)}
+  .nums{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin-top:4px;font-variant-numeric:tabular-nums}
+  .nums b{font-size:20px;font-weight:600}
+  .nums span{color:var(--muted);font-size:14px}
+  .nums .t{color:var(--text)}
+  .empty{color:var(--muted);text-align:center;padding:24px 0;font-size:14px}
+
+  .tools{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:22px}
+  .tools button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:10px 6px;font:inherit;font-size:13px;cursor:pointer}
+  .foot{color:#4a5664;font-size:12px;text-align:center;margin-top:14px}
+
+  .tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:20px}
+  .tabs button{background:none;border:0;color:var(--muted);padding:10px;border-radius:9px;font:inherit;font-size:15px;cursor:pointer}
+  .tabs button.on{background:var(--line2);color:var(--text)}
+
+  .chart{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 14px 10px;margin-bottom:12px}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .chart h3{margin:0;font-size:15px;font-weight:600}
+  .chart p{margin:3px 0 10px;color:var(--muted);font-size:12px;line-height:1.5}
+  .chart svg{display:block;width:100%;height:auto;overflow:visible}
+  .chart .vacio{color:var(--muted);font-size:13px;text-align:center;padding:26px 0}
+  .warn{color:#e8b86b}
+  .good{color:#7fd1a8}
+  .mini{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:2px}
+  .mini button{background:none;border:0;color:var(--muted);padding:4px 9px;border-radius:6px;font:inherit;font-size:12px;cursor:pointer}
+  .mini button.on{background:var(--line2);color:var(--text)}
+  .ley{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 4px 0 8px;vertical-align:0}
+  .grid{stroke:var(--line);stroke-width:1}
+  .ax{fill:var(--muted);font-size:9px;font-family:inherit}
+  .bar{fill:var(--accent);opacity:.4}
+  .bar.now{opacity:1}
+  .avg{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+  .dot{fill:var(--accent);opacity:.4}
+  .line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+  .p25{fill:var(--accent)} .p50{fill:#b9a3ff}
+  .h0{fill:var(--line)} .h1{fill:var(--accent);fill-opacity:.28} .h2{fill:var(--accent);fill-opacity:.5}
+  .h3{fill:var(--accent);fill-opacity:.75} .h4{fill:var(--accent)}
+
+  .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);
+    background:var(--line2);color:var(--text);padding:10px 16px;border-radius:10px;font-size:14px;
+    opacity:0;pointer-events:none;transition:.2s}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Nado<i>.</i></h1>
+    <span class="sub" id="hoyTxt"></span>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" data-tab="vReg" class="on">Registrar</button>
+    <button type="button" data-tab="vProg">Progreso</button>
+  </nav>
+
+  <div id="vProg" class="hidden">
+    <section class="stats" id="records"></section>
+    <div id="charts"></div>
+  </div>
+
+  <div id="vReg">
+  <section class="stats">
+    <div class="stat"><span>Semana</span><b id="stSem">0</b></div>
+    <div class="stat"><span>Mes</span><b id="stMes">0</b></div>
+    <div class="stat"><span>Ritmo</span><b id="stRit">—</b></div>
+  </section>
+
+  <form class="card" id="form" autocomplete="off">
+    <div class="field">
+      <label for="fecha">Día</label>
+      <input type="date" id="fecha" required>
+    </div>
+    <div class="field">
+      <label>Piscina</label>
+      <div class="seg" id="pool">
+        <button type="button" data-p="25">25 m</button>
+        <button type="button" data-p="50">50 m</button>
+      </div>
+    </div>
+    <div class="row field">
+      <div>
+        <label for="largos">Largos</label>
+        <input type="number" id="largos" inputmode="numeric" min="0" placeholder="0">
+      </div>
+      <div>
+        <label for="metros">Metros</label>
+        <input type="number" id="metros" inputmode="numeric" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="field">
+      <label>Tiempo</label>
+      <div class="row">
+        <input type="number" id="min" inputmode="numeric" min="0" placeholder="min">
+        <input type="number" id="seg" inputmode="numeric" min="0" max="59" placeholder="seg">
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+    <button class="btn" id="guardar" type="submit">Guardar</button>
+    <button class="btn ghost hidden" id="cancelar" type="button">Cancelar edición</button>
+  </form>
+
+  <h2><span>Historial</span><span id="count"></span></h2>
+  <ul id="lista"></ul>
+
+  <div class="tools">
+    <button id="expCsv" type="button">Exportar CSV</button>
+    <button id="expJson" type="button">Respaldo</button>
+    <button id="impJson" type="button">Restaurar</button>
+  </div>
+  <input type="file" id="file" accept="application/json,.json" class="hidden">
+  <p class="foot">Los datos se guardan solo en este celular. Haz un respaldo de vez en cuando.</p>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'nado.sesiones.v1', KEY_POOL = 'nado.piscina';
+const $ = s => document.querySelector(s);
+const DIAS = ['dom','lun','mar','mié','jue','vie','sáb'];
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+function leer(k){ try { return localStorage.getItem(k); } catch { return null; } }
+function escribir(k, v){ try { localStorage.setItem(k, v); return true; } catch { return false; } }
+
+let sesiones = (() => { try { return JSON.parse(leer(KEY)) || []; } catch { return []; } })();
+let piscina = Number(leer(KEY_POOL)) || 25;
+let editId = null;
+
+const guardarTodo = () => { if (!escribir(KEY, JSON.stringify(sesiones))) aviso('No se pudo guardar'); };
+const nuevoId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+function hoy(){ const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
+function parseFecha(s){ const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
+function fmtFecha(s){ const d = parseFecha(s); return `${DIAS[d.getDay()]} ${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`; }
+function fmtTiempo(s){
+  s = Math.round(s); const p = n => String(n).padStart(2,'0');
+  const h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60;
+  return h ? `${h}:${p(m)}:${p(x)}` : `${m}:${p(x)}`;
+}
+const ritmo = (seg, m) => (m > 0 && seg > 0) ? fmtTiempo(seg / (m/100)) : '—';
+const fmtM = n => n.toLocaleString('es-CO');
+
+function aviso(t){
+  const el = $('#toast'); el.textContent = t; el.classList.add('show');
+  clearTimeout(aviso._t); aviso._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+/* ---------- Formulario ---------- */
+function pintarPiscina(){
+  document.querySelectorAll('#pool button').forEach(b => b.classList.toggle('on', Number(b.dataset.p) === piscina));
+}
+function autoMetros(){
+  const l = parseInt($('#largos').value);
+  if (l > 0) $('#metros').value = l * piscina;
+  actualizarHint();
+}
+function leerSeg(){ return (parseInt($('#min').value) || 0) * 60 + (parseInt($('#seg').value) || 0); }
+function actualizarHint(){
+  const m = parseInt($('#metros').value) || 0, s = leerSeg();
+  $('#hint').textContent = (m > 0 && s > 0) ? `Ritmo ${ritmo(s, m)} /100 m` : '';
+}
+function limpiarForm(){
+  editId = null;
+  $('#fecha').value = hoy();
+  ['#largos','#metros','#min','#seg'].forEach(s => $(s).value = '');
+  $('#guardar').textContent = 'Guardar';
+  $('#cancelar').classList.add('hidden');
+  actualizarHint();
+}
+function cargarEnForm(s){
+  editId = s.id;
+  $('#fecha').value = s.fecha;
+  piscina = s.piscina; pintarPiscina();
+  $('#largos').value = s.largos || '';
+  $('#metros').value = s.metros || '';
+  $('#min').value = s.seg ? Math.floor(s.seg/60) : '';
+  $('#seg').value = s.seg ? s.seg % 60 : '';
+  $('#guardar').textContent = 'Actualizar';
+  $('#cancelar').classList.remove('hidden');
+  actualizarHint();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+$('#pool').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  piscina = Number(b.dataset.p); escribir(KEY_POOL, piscina);
+  pintarPiscina(); autoMetros();
+});
+$('#largos').addEventListener('input', autoMetros);
+['#metros','#min','#seg'].forEach(s => $(s).addEventListener('input', actualizarHint));
+$('#cancelar').addEventListener('click', () => { limpiarForm(); render(); });
+
+$('#form').addEventListener('submit', e => {
+  e.preventDefault();
+  const fecha = $('#fecha').value || hoy();
+  const largos = parseInt($('#largos').value) || 0;
+  const metros = parseInt($('#metros').value) || largos * piscina;
+  const seg = leerSeg();
+  if (metros <= 0) { aviso('Ingresa largos o metros'); return; }
+  const datos = { fecha, piscina, largos: largos || Math.round(metros / piscina), metros, seg };
+  if (editId) {
+    Object.assign(sesiones.find(s => s.id === editId), datos);
+    aviso('Sesión actualizada');
+  } else {
+    sesiones.push({ id: nuevoId(), creado: Date.now(), ...datos });
+    aviso('Sesión guardada');
+  }
+  guardarTodo(); limpiarForm(); render();
+});
+
+/* ---------- Historial y estadísticas ---------- */
+function lunes(fecha){
+  const d = new Date(fecha); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+  return d;
+}
+const inicioSemana = () => lunes(new Date());
+function render(){
+  renderProg();
+  const ini = inicioSemana(), ahora = new Date();
+  let sem = 0, mes = 0, mR = 0, sR = 0;
+  for (const s of sesiones) {
+    const d = parseFecha(s.fecha);
+    if (d >= ini) sem += s.metros;
+    if (d.getFullYear() === ahora.getFullYear() && d.getMonth() === ahora.getMonth()) mes += s.metros;
+    if (s.seg > 0) { mR += s.metros; sR += s.seg; }
+  }
+  $('#stSem').innerHTML = `${fmtM(sem)}<small> m</small>`;
+  $('#stMes').innerHTML = `${fmtM(mes)}<small> m</small>`;
+  $('#stRit').innerHTML = mR ? `${ritmo(sR, mR)}<small> /100</small>` : '—';
+
+  const orden = [...sesiones].sort((a,b) => b.fecha.localeCompare(a.fecha) || (b.creado||0) - (a.creado||0));
+  $('#count').textContent = sesiones.length ? `${sesiones.length}` : '';
+  const ul = $('#lista');
+  if (!orden.length) { ul.innerHTML = '<li class="empty">Aún no hay sesiones. Registra la primera arriba.</li>'; return; }
+  ul.innerHTML = orden.map(s => `
+    <li class="item${s.id === editId ? ' edit' : ''}" data-id="${s.id}">
+      <div class="item-top">
+        <span class="fecha">${fmtFecha(s.fecha)}</span>
+        <button class="del" type="button" aria-label="Eliminar">×</button>
+      </div>
+      <div class="nums">
+        <b>${fmtM(Number(s.metros))} m</b>
+        <span>${Number(s.largos)} largos · ${Number(s.piscina)} m</span>
+        ${s.seg ? `<span class="t">${fmtTiempo(s.seg)}</span><span>${ritmo(s.seg, s.metros)} /100 m</span>` : ''}
+      </div>
+    </li>`).join('');
+}
+$('#lista').addEventListener('click', e => {
+  const li = e.target.closest('.item'); if (!li) return;
+  const s = sesiones.find(x => x.id === li.dataset.id); if (!s) return;
+  if (e.target.closest('.del')) {
+    if (confirm(`¿Eliminar la sesión del ${fmtFecha(s.fecha)}?`)) {
+      sesiones = sesiones.filter(x => x.id !== s.id);
+      if (editId === s.id) limpiarForm();
+      guardarTodo(); render(); aviso('Sesión eliminada');
+    }
+    return;
+  }
+  cargarEnForm(s); render();
+});
+
+/* ---------- Exportar / respaldo ---------- */
+function descargar(nombre, contenido, tipo){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([contenido], { type: tipo }));
+  a.download = nombre; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+$('#expCsv').addEventListener('click', () => {
+  if (!sesiones.length) return aviso('No hay datos');
+  const filas = [...sesiones].sort((a,b) => a.fecha.localeCompare(b.fecha)).map(s =>
+    [s.fecha, s.piscina, s.largos, s.metros, s.seg ? fmtTiempo(s.seg) : '', s.seg || '', s.seg ? ritmo(s.seg, s.metros) : ''].join(','));
+  descargar(`nado-${hoy()}.csv`, '\ufeff' + ['fecha,piscina_m,largos,metros,tiempo,segundos,ritmo_100m', ...filas].join('\n'), 'text/csv');
+});
+$('#expJson').addEventListener('click', () => {
+  if (!sesiones.length) return aviso('No hay datos');
+  descargar(`nado-respaldo-${hoy()}.json`, JSON.stringify(sesiones, null, 1), 'application/json');
+});
+$('#impJson').addEventListener('click', () => $('#file').click());
+$('#file').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!Array.isArray(data)) throw 0;
+    const ids = new Set(sesiones.map(s => s.id)); let n = 0;
+    for (const s of data) {
+      if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s.fecha) || !(Number(s.metros) > 0)) continue;
+      const limpio = { id: String(s.id || nuevoId()), creado: Number(s.creado) || Date.now(), fecha: s.fecha,
+        piscina: Number(s.piscina) || 25, largos: Number(s.largos) || 0, metros: Number(s.metros), seg: Number(s.seg) || 0 };
+      if (!ids.has(limpio.id)) { sesiones.push(limpio); ids.add(limpio.id); n++; }
+    }
+    guardarTodo(); render(); aviso(`${n} sesiones restauradas`);
+  } catch { aviso('Archivo no válido'); }
+});
+
+/* ---------- Progreso: récords y gráficos (SVG propio, sin librerías) ---------- */
+const clave = d => { const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; };
+const corta = d => `${d.getDate()}/${d.getMonth()+1}`;
+const escala = (d0, d1, r0, r1) => v => d1 === d0 ? (r0 + r1) / 2 : r0 + (v - d0) * (r1 - r0) / (d1 - d0);
+const fmtKm = v => v >= 1000 ? (v/1000).toLocaleString('es-CO', { maximumFractionDigits: 1 }) + 'k' : String(Math.round(v));
+const r1 = n => Math.round(n * 10) / 10;
+function topeBonito(v){
+  if (v <= 0) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
+}
+const porFecha = (a, b) => a.fecha.localeCompare(b.fecha) || (a.creado||0) - (b.creado||0);
+const conTiempo = () => sesiones.filter(s => s.seg > 0 && s.metros > 0);
+let poolRitmo = null;
+
+function tarjeta(titulo, sub, cuerpo, extra = ''){
+  return `<section class="chart"><div class="chart-head"><h3>${titulo}</h3>${extra}</div><p>${sub}</p>${cuerpo}</section>`;
+}
+const vacio = t => `<div class="vacio">${t}</div>`;
+
+function gRecords(){
+  const t = conTiempo();
+  let mejor = null;
+  for (const s of t) { const p = s.seg / (s.metros/100); if (!mejor || p < mejor.p) mejor = { p, pool: s.piscina }; }
+  const larga = sesiones.reduce((a, s) => (!a || s.metros > a.metros) ? s : a, null);
+  // racha: semanas seguidas con al menos una sesión (si esta semana aún no nadas, cuenta desde la pasada)
+  const semanas = new Set(sesiones.map(s => clave(lunes(parseFecha(s.fecha)))));
+  const d = inicioSemana(); if (!semanas.has(clave(d))) d.setDate(d.getDate() - 7);
+  let racha = 0; while (semanas.has(clave(d))) { racha++; d.setDate(d.getDate() - 7); }
+  return `
+    <div class="stat"><span>Mejor ritmo</span><b>${mejor ? fmtTiempo(mejor.p) : '—'}${mejor ? `<small> ${mejor.pool}m</small>` : ''}</b></div>
+    <div class="stat"><span>Más larga</span><b>${larga ? fmtM(larga.metros) : '—'}${larga ? '<small> m</small>' : ''}</b></div>
+    <div class="stat"><span>Racha</span><b>${racha}<small> sem</small></b></div>`;
+}
+
+function gVolumen(){
+  const N = 12, W = 320, H = 170, L = 30, R = 6, T = 8, B = 20;
+  const hoyL = inicioSemana(), sem = [];
+  for (let i = N - 1; i >= 0; i--) { const d = new Date(hoyL); d.setDate(d.getDate() - 7*i); sem.push({ d, k: clave(d), m: 0 }); }
+  const idx = Object.fromEntries(sem.map((s, i) => [s.k, i]));
+  for (const s of sesiones) { const k = clave(lunes(parseFecha(s.fecha))); if (k in idx) sem[idx[k]].m += s.metros; }
+  const tope = topeBonito(Math.max(...sem.map(s => s.m)));
+  const y = escala(0, tope, H - B, T), bw = (W - L - R) / N;
+  let g = '';
+  for (const v of [0, tope/2, tope]) g += `<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L-4}" y="${y(v)+3}" text-anchor="end">${fmtKm(v)}</text>`;
+  sem.forEach((s, i) => {
+    const x = L + i*bw + bw*.18, w = bw*.64;
+    if (s.m > 0) g += `<rect class="bar${i === N-1 ? ' now' : ''}" x="${r1(x)}" y="${r1(y(s.m))}" width="${r1(w)}" height="${r1(H - B - y(s.m))}" rx="2"/>`;
+    if ((N - 1 - i) % 3 === 0) g += `<text class="ax" x="${r1(x + w/2)}" y="${H - 6}" text-anchor="middle">${corta(s.d)}</text>`;
+  });
+  const conDatos = sem.filter(s => s.m > 0), prom = conDatos.length ? conDatos.reduce((a, s) => a + s.m, 0) / conDatos.length : 0;
+  if (prom) g += `<line class="avg" x1="${L}" x2="${W-R}" y1="${r1(y(prom))}" y2="${r1(y(prom))}"/>`;
+  const act = sem[N-1].m, ant = sem[N-2].m;
+  let cambio = '';
+  if (ant > 0 && act > 0) {
+    const pct = Math.round((act - ant) / ant * 100);
+    cambio = pct > 10 ? ` · <span class="warn">↑ ${pct}% vs la anterior: sube con calma</span>` : ` · ${pct >= 0 ? '+' : ''}${pct}% vs la anterior`;
+  }
+  return tarjeta('Volumen semanal', `Esta semana ${fmtM(act)} m · promedio ${fmtM(Math.round(prom))} m (línea punteada)${cambio}`,
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Metros por semana">${g}</svg>`);
+}
+
+function gRitmo(){
+  const t = conTiempo();
+  if (!poolRitmo) { const c25 = t.filter(s => s.piscina === 25).length; poolRitmo = (t.length - c25 > c25) ? 50 : 25; }
+  const pts = t.filter(s => s.piscina === poolRitmo).sort(porFecha).map(s => ({ d: parseFecha(s.fecha), p: s.seg / (s.metros/100) }));
+  const selector = `<div class="mini" data-pool>${[25, 50].map(p => `<button type="button" data-p="${p}" class="${p === poolRitmo ? 'on' : ''}">${p} m</button>`).join('')}</div>`;
+  if (pts.length < 2) return tarjeta('Ritmo por 100 m', 'Arriba es más rápido.', vacio(`Necesitas al menos 2 sesiones con tiempo en piscina de ${poolRitmo} m.`), selector);
+  const W = 320, H = 170, L = 34, R = 8, T = 8, B = 20;
+  const ps = pts.map(x => x.p);
+  let lo = Math.min(...ps), hi = Math.max(...ps); const pad = (hi - lo) * .15 || 5; lo -= pad; hi += pad;
+  const x = escala(0, pts.length - 1, L + 4, W - R), y = escala(lo, hi, T, H - B); // rápido (menor) arriba
+  let g = '';
+  for (const v of [lo + pad, (lo + hi)/2, hi - pad]) g += `<line class="grid" x1="${L}" x2="${W-R}" y1="${r1(y(v))}" y2="${r1(y(v))}"/><text class="ax" x="${L-4}" y="${r1(y(v))+3}" text-anchor="end">${fmtTiempo(v)}</text>`;
+  pts.forEach((q, i) => g += `<circle class="dot" cx="${r1(x(i))}" cy="${r1(y(q.p))}" r="2.8"/>`);
+  const k = Math.min(5, pts.length);
+  const media = ps.map((_, i) => { const s = ps.slice(Math.max(0, i - k + 1), i + 1); return s.reduce((a, b) => a + b, 0) / s.length; });
+  g += `<path class="line" d="${media.map((m, i) => `${i ? 'L' : 'M'}${r1(x(i))},${r1(y(m))}`).join('')}"/>`;
+  g += `<text class="ax" x="${L+4}" y="${H-6}">${corta(pts[0].d)}</text><text class="ax" x="${W-R}" y="${H-6}" text-anchor="end">${corta(pts[pts.length-1].d)}</text>`;
+  let sub = `Último ${fmtTiempo(ps[ps.length-1])} · mejor ${fmtTiempo(Math.min(...ps))}. Arriba es más rápido; la línea es la media de ${k} sesiones.`;
+  if (ps.length >= 6) {
+    const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+    const n = Math.min(5, Math.floor(ps.length / 2));
+    const dif = Math.round(avg(ps.slice(-n)) - avg(ps.slice(-2*n, -n)));
+    if (dif) sub += ` <span class="${dif < 0 ? 'good' : 'warn'}">${dif < 0 ? '−' : '+'}${Math.abs(dif)} s vs las ${n} anteriores</span>`;
+  }
+  return tarjeta('Ritmo por 100 m', sub, `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ritmo por sesión">${g}</svg>`, selector);
+}
+
+function gDispersion(){
+  const t = conTiempo();
+  if (t.length < 2) return tarjeta('Ritmo vs distancia', '¿Mantienes el ritmo cuando nadas más?', vacio('Necesitas al menos 2 sesiones con tiempo.'));
+  const W = 320, H = 170, L = 34, R = 8, T = 8, B = 20;
+  const pts = t.map(s => ({ m: s.metros, p: s.seg / (s.metros/100), pool: s.piscina }));
+  const tope = topeBonito(Math.max(...pts.map(q => q.m)));
+  const paso = tope / 4, base = Math.max(0, Math.floor((Math.min(...pts.map(q => q.m)) - paso / 2) / paso) * paso);
+  let lo = Math.min(...pts.map(q => q.p)), hi = Math.max(...pts.map(q => q.p)); const pad = (hi - lo) * .15 || 5; lo -= pad; hi += pad;
+  const x = escala(base, tope, L + 4, W - R), y = escala(lo, hi, T, H - B);
+  let g = '';
+  for (const v of [lo + pad, (lo + hi)/2, hi - pad]) g += `<line class="grid" x1="${L}" x2="${W-R}" y1="${r1(y(v))}" y2="${r1(y(v))}"/><text class="ax" x="${L-4}" y="${r1(y(v))+3}" text-anchor="end">${fmtTiempo(v)}</text>`;
+  for (const v of [base, (base + tope)/2, tope]) g += `<text class="ax" x="${r1(x(v))}" y="${H-6}" text-anchor="${v === base ? 'start' : v === tope ? 'end' : 'middle'}">${fmtKm(v)} m</text>`;
+  for (const q of pts) g += `<circle class="${q.pool === 50 ? 'p50' : 'p25'}" cx="${r1(x(q.m))}" cy="${r1(y(q.p))}" r="3.2" opacity=".85"/>`;
+  return tarjeta('Ritmo vs distancia',
+    `Cada punto es una sesión; arriba es más rápido.<span class="ley" style="background:var(--accent)"></span>25 m<span class="ley" style="background:#b9a3ff"></span>50 m`,
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ritmo contra metros">${g}</svg>`);
+}
+
+function gCalendario(){
+  const SEM = 18, C = 16, L = 14, T = 14;
+  const W = L + SEM*C, H = T + 7*C;
+  const inicio = inicioSemana(); inicio.setDate(inicio.getDate() - 7*(SEM - 1));
+  const hoyD = parseFecha(hoy()), porDia = {};
+  for (const s of sesiones) porDia[s.fecha] = (porDia[s.fecha] || 0) + s.metros;
+  let max = 0, dias = 0;
+  const celdas = [];
+  for (let c = 0; c < SEM; c++) for (let r = 0; r < 7; r++) {
+    const d = new Date(inicio); d.setDate(d.getDate() + c*7 + r);
+    if (d > hoyD) continue;
+    const m = porDia[clave(d)] || 0; if (m) { dias++; max = Math.max(max, m); }
+    celdas.push({ c, r, d, m });
+  }
+  let g = '';
+  [['L', 0], ['X', 2], ['V', 4]].forEach(([t, r]) => g += `<text class="ax" x="0" y="${T + r*C + 10}">${t}</text>`);
+  for (const q of celdas) {
+    const nivel = q.m ? Math.max(1, Math.ceil(q.m / max * 4)) : 0;
+    g += `<rect class="h${nivel}" x="${L + q.c*C}" y="${T + q.r*C}" width="13" height="13" rx="3"><title>${fmtFecha(clave(q.d))}${q.m ? ': ' + fmtM(q.m) + ' m' : ''}</title></rect>`;
+    if (q.r === 0 && q.d.getDate() <= 7) g += `<text class="ax" x="${L + q.c*C}" y="${T - 4}">${MESES[q.d.getMonth()]}</text>`;
+  }
+  return tarjeta('Constancia', `${dias} días nadados en las últimas ${SEM} semanas. Más intenso = más metros.`,
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Calendario de sesiones">${g}</svg>`);
+}
+
+function renderProg(){
+  $('#records').innerHTML = gRecords();
+  $('#charts').innerHTML = sesiones.length
+    ? gVolumen() + gRitmo() + gDispersion() + gCalendario()
+    : '<div class="chart">' + vacio('Registra tu primera sesión para ver tu progreso.') + '</div>';
+}
+$('#charts').addEventListener('click', e => {
+  const b = e.target.closest('[data-pool] button'); if (!b) return;
+  poolRitmo = Number(b.dataset.p); renderProg();
+});
+$('#tabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  ['vReg', 'vProg'].forEach(id => $('#' + id).classList.toggle('hidden', id !== b.dataset.tab));
+  window.scrollTo(0, 0);
+});
+
+/* ---------- Inicio ---------- */
+$('#hoyTxt').textContent = fmtFecha(hoy());
+pintarPiscina(); limpiarForm(); render();
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
