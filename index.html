@@ -203,6 +203,8 @@ function fmtTiempo(s){
 }
 const ritmo = (seg, m) => (m > 0 && seg > 0) ? fmtTiempo(seg / (m/100)) : '—';
 const fmtM = n => n.toLocaleString('es-CO');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const idValido = v => typeof v === 'string' && /^[\w-]{1,64}$/.test(v);
 
 function aviso(t){
   const el = $('#toast'); el.textContent = t; el.classList.add('show');
@@ -226,6 +228,7 @@ function actualizarHint(){
 function limpiarForm(){
   editId = null;
   $('#fecha').value = hoy();
+  $('#fecha').max = hoy();
   ['#largos','#metros','#min','#seg'].forEach(s => $(s).value = '');
   $('#guardar').textContent = 'Guardar';
   $('#cancelar').classList.add('hidden');
@@ -261,9 +264,11 @@ $('#form').addEventListener('submit', e => {
   const metros = parseInt($('#metros').value) || largos * piscina;
   const seg = leerSeg();
   if (metros <= 0) { aviso('Ingresa largos o metros'); return; }
+  if (fecha > hoy()) { aviso('La fecha no puede ser futura'); return; }
   const datos = { fecha, piscina, largos: largos || Math.round(metros / piscina), metros, seg };
-  if (editId) {
-    Object.assign(sesiones.find(s => s.id === editId), datos);
+  const actual = editId && sesiones.find(s => s.id === editId);
+  if (actual) {
+    Object.assign(actual, datos);
     aviso('Sesión actualizada');
   } else {
     sesiones.push({ id: nuevoId(), creado: Date.now(), ...datos });
@@ -298,7 +303,7 @@ function render(){
   const ul = $('#lista');
   if (!orden.length) { ul.innerHTML = '<li class="empty">Aún no hay sesiones. Registra la primera arriba.</li>'; return; }
   ul.innerHTML = orden.map(s => `
-    <li class="item${s.id === editId ? ' edit' : ''}" data-id="${s.id}">
+    <li class="item${s.id === editId ? ' edit' : ''}" data-id="${esc(s.id)}">
       <div class="item-top">
         <span class="fecha">${fmtFecha(s.fecha)}</span>
         <button class="del" type="button" aria-label="Eliminar">×</button>
@@ -350,8 +355,9 @@ $('#file').addEventListener('change', async e => {
     const ids = new Set(sesiones.map(s => s.id)); let n = 0;
     for (const s of data) {
       if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s.fecha) || !(Number(s.metros) > 0)) continue;
-      const limpio = { id: String(s.id || nuevoId()), creado: Number(s.creado) || Date.now(), fecha: s.fecha,
-        piscina: Number(s.piscina) || 25, largos: Number(s.largos) || 0, metros: Number(s.metros), seg: Number(s.seg) || 0 };
+      const limpio = { id: idValido(s.id) ? s.id : nuevoId(), creado: Number(s.creado) || Date.now(), fecha: s.fecha,
+        piscina: Number(s.piscina) === 50 ? 50 : 25, largos: Math.max(0, Math.round(Number(s.largos) || 0)),
+        metros: Math.round(Number(s.metros)), seg: Math.max(0, Math.round(Number(s.seg) || 0)) };
       if (!ids.has(limpio.id)) { sesiones.push(limpio); ids.add(limpio.id); n++; }
     }
     guardarTodo(); render(); aviso(`${n} sesiones restauradas`);
@@ -510,6 +516,16 @@ $('#tabs').addEventListener('click', e => {
 /* ---------- Inicio ---------- */
 $('#hoyTxt').textContent = fmtFecha(hoy());
 pintarPiscina(); limpiarForm(); render();
+// Si la app queda abierta de un día para otro, al volver se actualiza la fecha y las estadísticas.
+let diaVisto = hoy();
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden || diaVisto === hoy()) return;
+  diaVisto = hoy();
+  $('#hoyTxt').textContent = fmtFecha(diaVisto);
+  $('#fecha').max = diaVisto;
+  if (!editId) $('#fecha').value = diaVisto;
+  render();
+});
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>

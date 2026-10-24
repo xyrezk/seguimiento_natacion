@@ -23,4 +23,4 @@ Registro personal de natación: día, metros, largos y tiempo. Es una PWA (app w
 
 ## Actualizar la app
 
-Si cambias el código, sube el cambio y en `sw.js` sube la versión (`nado-v1` → `nado-v2`). El celular toma la nueva versión la siguiente vez que abras la app (a veces hace falta abrirla dos veces).
+Si cambias el código, sube el cambio y en `sw.js` sube la versión (por ejemplo `nado-v3` → `nado-v4`). El celular toma la nueva versión la siguiente vez que abras la app (a veces hace falta abrirla dos veces).
